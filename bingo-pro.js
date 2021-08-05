@@ -1,10 +1,11 @@
 let playerScore = 1000; //set default points for the player
-let isLine = false; //set 'cantar línea' to false value
+let isLine = false; //set line to false
+let numberOfTurns = 0; //set number of turns to 0
 
-//generates all bingo numbers
+//generates all bingo numbers in bombo
 let allBingoNumbers = new Array(99).fill(0).map((e, i) => i + 1);
 
-//asks player's username
+//asks player's name
 const asksPlayerName = () => {
   let playerName = window.prompt('WELCOME TO BINGO! What is your name?');
   if (playerName !== null)
@@ -24,9 +25,9 @@ Player.prototype.getData = function () {
 
 //RANKING SYSTEM: list of ficticial players
 const brendan = new Player('Brendan', 925);
-const bong = new Player('Bong Joon Ho', 540);
+const bong = new Player('Bong Joon Ho', 510);
 const cooper = new Player('Cooper', 655);
-const elon = new Player('Elon Musk', 900);
+const elon = new Player('Elon Musk', 850);
 
 //RANKING SYSTEM: explains how ranking works and shows current ranking
 const showRank = () => {
@@ -34,14 +35,36 @@ const showRank = () => {
   The more turns you need to complete the bingo,
   the less points you will get. Good luck!`);
   window.alert(`Current ranking is:
-   ${brendan.getData()},
-   ${elon.getData()},
-   ${cooper.getData()},
-   ${bong.getData()}
+   1. ${brendan.getData()},
+   2. ${elon.getData()},
+   3. ${cooper.getData()},
+   4. ${bong.getData()}
    `);
 };
 
-//BINGO CARD FUNCTION: generates 15 random numbers for the card
+//RANKING SYSTEM: show final rank to player
+const showScoreResult = () => {
+  if (!bingoCard.every((e) => e.matched === true))
+    console.log('You left the game. No score achieved. See you soon!');
+  else {
+    console.log(`You got ${playerScore} points.`);
+    let points = [];
+    points.push(
+      brendan.score,
+      elon.score,
+      cooper.score,
+      bong.score,
+      playerScore
+    );
+    points.sort(function (a, b) {
+      return b - a;
+    });
+    let playerPointsRank = points.indexOf(playerScore) + 1;
+    console.log(`You got the place number ${playerPointsRank} in the rank!`);
+  }
+};
+
+//generates 15 random numbers for the card
 const generate15RandomNumbers = () => {
   let cardNumbers = [];
   while (cardNumbers.length < 15) {
@@ -53,16 +76,9 @@ const generate15RandomNumbers = () => {
   return cardNumbers;
 };
 
-let card = generate15RandomNumbers(); //creates first bingo card for the player
+let card = generate15RandomNumbers(); //creates first card for the player
 
-//BINGO CARD FUNCTION: pull a bingo number from bombo
-const pullRandomBingoNumber = () => {
-  let indexNum = Math.floor(Math.random() * allBingoNumbers.length);
-  let removedNum = allBingoNumbers.splice(indexNum, 1);
-  return removedNum[0];
-};
-
-//BINGO CARD FUNCTION: asks user to choose a bingo card
+//asks user to choose a bingo card
 const bingoCardSelection = () => {
   console.table(card);
   let askCard = window.confirm(
@@ -73,11 +89,19 @@ const bingoCardSelection = () => {
     bingoCardSelection();
   }
   bingoCard = card.map((number) => {
+    //formates card into an object
     return {
       number: number,
       matched: false,
     };
   });
+};
+
+//pull a bingo number from bombo
+const pullRandomBingoNumber = () => {
+  let indexNum = Math.floor(Math.random() * allBingoNumbers.length);
+  let removedNum = allBingoNumbers.splice(indexNum, 1);
+  return removedNum[0];
 };
 
 //check if number is in the player's bingo card
@@ -95,35 +119,27 @@ const checkNumber = () => {
   }
 };
 
+//asks player to continue after each turn
 const continueOrNot = () => {
   let nextNumberQuestion = window.confirm(
     'Do you want to continue with next number?'
   );
-  if (nextNumberQuestion) return true;
-  else return false;
+  if (nextNumberQuestion) nextTurn();
+  else window.alert('Thank you and bye!');
 };
 
-//checks if number is in the player's card
-
-//continue game
+//performs next turn picking a new number from bomb
 const nextTurn = () => {
-  let numberOfTurns = 0;
-  while (!bingoCard.every((element) => element.matched === true)) {
+  if (!bingoCard.every((element) => element.matched === true)) {
     checkNumber();
     checkLine();
     numberOfTurns++;
     playerScore -= 5;
-    let nextNumber = continueOrNot();
-    if (!nextNumber) console.log('Bye!');
+    continueOrNot();
   }
-  window.alert('BINGO!');
-  console.log(`You have won in ${numberOfTurns} turns.`);
 };
 
-const showPointsResults = () => {
-  console.log(`You got ${playerScore} points.`);
-};
-
+//notifies if player has a bingo line
 const checkLine = () => {
   if (!isLine) {
     if (
@@ -131,14 +147,24 @@ const checkLine = () => {
       bingoCard.slice(5, 10).every((e) => e.matched === true) ||
       bingoCard.slice(10, 15).every((e) => e.matched === true)
     ) {
-      console.log('LÍNEA!');
+      console.log('LINE!');
       isLine = true;
     }
   }
 };
 
+//notifies when player completed bingo
+const bingo = () => {
+  if (bingoCard.every((e) => e.matched === true)) {
+    window.alert('BINGO!');
+    console.log(`You have won in ${numberOfTurns} turns.`);
+  }
+};
+
+/* starts program */
 asksPlayerName();
 bingoCardSelection();
 showRank();
 nextTurn();
-showPointsResults();
+bingo();
+showScoreResult();
