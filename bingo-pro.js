@@ -63,6 +63,7 @@ const showScoreResult = () => {
 
 //generates 15 random numbers for the card
 const generate15RandomNumbers = () => {
+  let cardNumbers = [];
   while (cardNumbers.length < 15) {
     let randomNumber = Math.floor(Math.random() * 99);
     let numCheck = cardNumbers.find((number) => number === randomNumber);
@@ -97,7 +98,7 @@ const pullRandomBingoNumber = () => {
 };
 
 //check if number is in the player´s bingo card
-const checkIfNumberIsOnCard = () => {
+const checkNumber = () => {
   let newBingoNum = pullRandomBingoNumber();
   let showNextNum = window.confirm(newBingoNum);
   if (showNextNum) {
@@ -110,22 +111,22 @@ const checkIfNumberIsOnCard = () => {
   }
 };
 
-//asks player to continue after each turn
-const continueOrNot = () => {
-  let nextNumberQuestion = window.confirm('Do you want to continue with next number?');
-  if (nextNumberQuestion) nextTurn();
-  else window.alert('Thank you and bye!');
-};
-
 //performs next turn 
-const nextTurn = () => {
+const startTurn = () => {
   if (!bingoCard.every((element) => element.number === 'X')) {
-    checkIfNumberIsOnCard();
+    checkNumber();
     checkLine();
     numberOfTurns++;
     playerScore -= 5;
     continueOrNot();
   }
+};
+
+//asks player to continue after each turn
+const continueOrNot = () => {
+  let nextNumberQuestion = window.confirm('Do you want to continue with next number?');
+  if (nextNumberQuestion) startTurn();
+  else window.alert('Thank you and bye!');
 };
 
 //notifies if player has a bingo line
@@ -153,6 +154,6 @@ const bingo = () => {
 /* starts program */
 bingoCardSelection();
 explainGame();
-nextTurn();
+startTurn();
 bingo();
 showScoreResult();
