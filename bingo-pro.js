@@ -1,22 +1,18 @@
 let playerScore = 1000; //set starting points for the player
 let isLine = false; //set bingo line to false
 let numberOfTurns = 0; //set number of turns to 0
+let allBingoNumbers = new Array(99).fill(0).map((e, i) => i + 1); //generates all bingo numbers in bombo
 
 //asks player's name
 const asksPlayerName = () => {
   let playerName = window.prompt('WELCOME TO THE BINGO GAME! What´s your name?');
-  if (playerName !== null) window.alert(`Hello ${playerName}. Let´s start the game!`);
-  else  {
+  if (playerName === null || playerName === '') {
     playerName = 'guest'
     window.alert(`Hi guest! Let´s start the game`);
-    }
-    return playerName;
+  }
+  else window.alert(`Hello ${playerName}. Let´s start the game!`);
+  return playerName;
 };
-
-let playerName = asksPlayerName();
-
-//generates all bingo numbers in bombo
-let allBingoNumbers = new Array(99).fill(0).map((e, i) => i + 1);
 
 //RANKING SYSTEM: ficticial player constructor
 function Player(name, score) {
@@ -48,7 +44,7 @@ const showScoreResult = () => {
   else {
     console.log(`You got ${playerScore} points.`);
     let ranking = [];
-    const player = new Player(playerName, playerScore);
+    const player = new Player('You', playerScore);
     ranking.push(brendan, elon, cooper, bong, player);
     ranking.sort(function (a, b) {
       return b.score - a.score;
@@ -100,15 +96,14 @@ const pullRandomBingoNumber = () => {
 //check if number is in the player´s bingo card
 const checkNumber = () => {
   let newBingoNum = pullRandomBingoNumber();
-  let showNextNum = window.confirm(newBingoNum);
-  if (showNextNum) {
+  console.log(`Number ${newBingoNum}`);
+  window.confirm(newBingoNum);
     let indexNum = card.indexOf(newBingoNum);
     if (indexNum !== -1) {
       console.log(`You´ve found the number ${card[indexNum]} in your card!`);
       bingoCard[indexNum].number = 'X';
       console.table(bingoCard);
     }
-  }
 };
 
 //performs next turn 
@@ -144,7 +139,7 @@ const checkLine = () => {
 };
 
 //notifies when player completed bingo game
-const bingo = () => {
+const isBingo = () => {
   if (bingoCard.every((e) => e.number === 'X')) {
     window.alert('BINGO!');
     console.log(`Bingo completed! You have won in ${numberOfTurns} turns.`);
@@ -152,8 +147,14 @@ const bingo = () => {
 };
 
 /* starts program */
-bingoCardSelection();
-explainGame();
-startTurn();
+
+function bingo () {
+  asksPlayerName();
+  bingoCardSelection();
+  explainGame();
+  startTurn();
+  isBingo();
+  showScoreResult();
+} 
+
 bingo();
-showScoreResult();
