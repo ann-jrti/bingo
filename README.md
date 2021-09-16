@@ -1,2 +1,3 @@
-# bingo
-Simple bingo game
+# bingo in console!
+
+Exercise for playing around with string and array methods
